@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/books")
@@ -16,42 +17,55 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
+    // Create a new book
     @PostMapping
     public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO bookDTO) {
-        try {
-            BookDTO createdBook = bookService.saveBook(bookDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
-        } catch (Exception e) {
-            // Ghi log lỗi và trả về phản hồi lỗi
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        BookDTO savedBook = bookService.saveBook(bookDTO);
+        return ResponseEntity.ok(savedBook);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<BookDTO>> getBooksByUserId(@PathVariable int userId) {
+        List<BookDTO> books = bookService.getBooksByUserId(userId);
+        return ResponseEntity.ok(books);
+    }
+
+    // Get all books
+    @GetMapping
+    public ResponseEntity<List<BookDTO>> getAllBooks() {
+        List<BookDTO> books = bookService.getAllBooks();
+        return ResponseEntity.ok(books);
+    }
+
+    // Update a book
+    @PutMapping("/{id}")
+    public ResponseEntity<BookDTO> updateBook(@PathVariable int id, @RequestBody BookDTO bookDTO) {
+        Optional<BookDTO> existingBook = bookService.getBookById(id);
+        if (existingBook.isPresent()) {
+            bookDTO.setId(id); // Ensure we are updating the correct book
+            BookDTO updatedBook = bookService.saveBook(bookDTO);
+            return ResponseEntity.ok(updatedBook);
+        } else {
+            return ResponseEntity.notFound().build();
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BookDTO> updateBook(@PathVariable int id, @RequestBody BookDTO bookDTO) {
-        bookDTO.setId(id);
-        BookDTO updatedBook = bookService.saveBook(bookDTO);
-        return ResponseEntity.ok(updatedBook);
-    }
-
+    // Delete a book by ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable int id) {
-        bookService.deleteBook(id);
-        return ResponseEntity.noContent().build();
+        if (bookService.getBookById(id).isPresent()) {
+            bookService.deleteBook(id);
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @GetMapping("/genre/{genreId}")
-    public List<BookDTO> getBooksByGenre(@PathVariable int genreId) {
-        return bookService.getBooksByGenre(genreId);
+    // Find books by genreId and return their titles
+    @GetMapping("/genre/{genreId}/titles")
+    public ResponseEntity<List<String>> getBookTitlesByGenre(@PathVariable int genreId) {
+        List<String> bookTitles = bookService.getBookTitlesByGenreId(genreId);
+        return ResponseEntity.ok(bookTitles);
     }
-
-    @GetMapping
-    public List<BookDTO> getAllBooks() {
-        return bookService.getAllBooks();
-    }
-
-
-
 }
 

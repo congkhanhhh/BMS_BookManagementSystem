@@ -19,16 +19,15 @@ public class UserProfileController {
     @Autowired
     private UserService userService;
 
-
     @PostMapping
     public ResponseEntity<UserProfileDTO> createUserProfile(@RequestBody UserProfileDTO userProfileDTO) {
         UserProfileDTO createdProfile = userProfileService.createUserProfile(userProfileDTO);
         return new ResponseEntity<>(createdProfile, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserProfileDTO> updateUserProfile(@PathVariable Long id, @RequestBody UserProfileDTO userProfileDTO) {
-        UserProfileDTO updatedProfile = userProfileService.updateUserProfile(id, userProfileDTO);
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserProfileDTO> updateUserProfile(@PathVariable Long userId, @RequestBody UserProfileDTO userProfileDTO) {
+        UserProfileDTO updatedProfile = userProfileService.updateUserProfile(userId, userProfileDTO);
         if (updatedProfile != null) {
             return new ResponseEntity<>(updatedProfile, HttpStatus.OK);
         } else {
@@ -36,9 +35,9 @@ public class UserProfileController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserProfileDTO> getUserProfile(@PathVariable Long id) {
-        UserProfileDTO userProfileDTO = userProfileService.getUserProfile(id);
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserProfileDTO> getUserProfile(@PathVariable Long userId) {
+        UserProfileDTO userProfileDTO = userProfileService.getUserProfile(userId);
         if (userProfileDTO != null) {
             return new ResponseEntity<>(userProfileDTO, HttpStatus.OK);
         } else {
@@ -46,14 +45,14 @@ public class UserProfileController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUserProfile(@PathVariable Long id) {
-        userProfileService.deleteUserProfile(id);
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUserProfile(@PathVariable Long userId) {
+        userProfileService.deleteUserProfile(userId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
     @PutMapping("/{userId}/change-password")
-    public ResponseEntity<Void> changePassword(@PathVariable Long userId,
-                                               @RequestBody ChangepasswordDTO changePasswordDTO) {
+    public ResponseEntity<Void> changePassword(@PathVariable Long userId, @RequestBody ChangepasswordDTO changePasswordDTO) {
         userService.changePassword(userId, changePasswordDTO);
         return ResponseEntity.ok().build();
     }

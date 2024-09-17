@@ -3,6 +3,7 @@ package com.bookstore.project.service;
 import com.bookstore.project.dto.ChangepasswordDTO;
 import com.bookstore.project.dto.UserDTO;
 import com.bookstore.project.entity.User;
+import com.bookstore.project.exception.ResourceNotFoundException;
 import com.bookstore.project.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserDTO {
-    private Long id;
+    private int id;
     @NotEmpty(message = "Email should not be empty")
     @Email
     private String email;

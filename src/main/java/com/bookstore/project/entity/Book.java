@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 
@@ -22,9 +23,16 @@ public class Book {
     private String author;
     @Column(name = "description")
     private String description;
+    @Column(name = "picture")
+    private String picture;
+    @Column(name = "price")
+    private Double price;
     @ManyToOne
     @JoinColumn(name = "genre_id", referencedColumnName = "id")
     private Genre genre;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
     @Column(name = "created_at")
-    private Date created_at;
+    private LocalDate created_at;
 }

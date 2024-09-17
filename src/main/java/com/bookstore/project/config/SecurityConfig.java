@@ -19,7 +19,7 @@ public class SecurityConfig {
                         // Allow Swagger access without authentication
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html" ).permitAll()
                         // Allow public access to signup and login APIs
-                        .requestMatchers("/api/auth/**","/api/books/**","/api/genres/**","/api/user-profile/**").permitAll()
+                        .requestMatchers("/api/auth/**","/api/books/**","/api/genres/**","/api/user-profile/**","/api/favorites/**").permitAll()
                         // Authenticate all other requests
                         .anyRequest().authenticated()
                 )

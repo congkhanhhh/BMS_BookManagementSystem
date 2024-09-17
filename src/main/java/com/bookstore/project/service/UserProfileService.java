@@ -1,6 +1,5 @@
 package com.bookstore.project.service;
 
-import com.bookstore.project.dto.ChangepasswordDTO;
 import com.bookstore.project.dto.UserProfileDTO;
 import com.bookstore.project.entity.User;
 import com.bookstore.project.entity.UserProfile;
@@ -19,16 +18,16 @@ public class UserProfileService {
     private UserProfileRepository userProfileRepository;
 
     @Autowired
-    private UserRepository userRepository; // Thêm UserRepository
+    private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     public UserProfileDTO createUserProfile(UserProfileDTO userProfileDTO) {
-        Optional<User> user = userRepository.findById(Math.toIntExact(userProfileDTO.getUserId()));
+        Optional<User> user = userRepository.findById(userProfileDTO.getUserId());
         if (user.isPresent()) {
             UserProfile userProfile = new UserProfile();
-            userProfile.setUser(user.get()); // Đặt đối tượng User đã tồn tại
+            userProfile.setUser(user.get());
             userProfile.setFullName(userProfileDTO.getFullName());
             userProfile.setAddress(userProfileDTO.getAddress());
             userProfile.setPhoneNumber(userProfileDTO.getPhoneNumber());
@@ -40,8 +39,8 @@ public class UserProfileService {
         }
     }
 
-    public UserProfileDTO updateUserProfile(Long id, UserProfileDTO userProfileDTO) {
-        Optional<UserProfile> existingProfile = userProfileRepository.findById(id);
+    public UserProfileDTO updateUserProfile(long userId, UserProfileDTO userProfileDTO) {
+        Optional<UserProfile> existingProfile = userProfileRepository.findByUserId(userId);
         if (existingProfile.isPresent()) {
             UserProfile userProfile = existingProfile.get();
             userProfile.setFullName(userProfileDTO.getFullName());
@@ -51,17 +50,22 @@ public class UserProfileService {
             UserProfile updatedProfile = userProfileRepository.save(userProfile);
             return convertToDTO(updatedProfile);
         } else {
-            return null; // Handle this case as needed
+            throw new RuntimeException("User profile not found for user id: " + userId);
         }
     }
 
-    public UserProfileDTO getUserProfile(Long id) {
-        Optional<UserProfile> userProfile = userProfileRepository.findById(id);
+    public UserProfileDTO getUserProfile(long userId) {
+        Optional<UserProfile> userProfile = userProfileRepository.findByUserId(userId);
         return userProfile.map(this::convertToDTO).orElse(null);
     }
 
-    public void deleteUserProfile(Long id) {
-        userProfileRepository.deleteById(id);
+    public void deleteUserProfile(long userId) {
+        Optional<UserProfile> userProfile = userProfileRepository.findByUserId(userId);
+        if (userProfile.isPresent()) {
+            userProfileRepository.delete(userProfile.get());
+        } else {
+            throw new RuntimeException("User profile not found for user id: " + userId);
+        }
     }
 
     private UserProfileDTO convertToDTO(UserProfile userProfile) {
@@ -75,5 +79,3 @@ public class UserProfileService {
         return dto;
     }
 }
-
-

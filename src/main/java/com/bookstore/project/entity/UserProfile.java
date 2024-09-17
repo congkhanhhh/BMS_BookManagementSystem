@@ -14,8 +14,7 @@ public class UserProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    private int id;
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
