@@ -53,4 +53,9 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
         userRepository.save(user);
     }
+
+    public boolean existsById(int userId) {
+        return userRepository.existsById(userId);
+    }
+
 }
