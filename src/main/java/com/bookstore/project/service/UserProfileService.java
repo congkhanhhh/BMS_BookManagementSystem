@@ -71,7 +71,7 @@ public class UserProfileService {
     private UserProfileDTO convertToDTO(UserProfile userProfile) {
         UserProfileDTO dto = new UserProfileDTO();
         dto.setId(userProfile.getId());
-        dto.setUserId(userProfile.getUser().getId());
+        dto.setUserId(Math.toIntExact(userProfile.getUser().getId()));
         dto.setFullName(userProfile.getFullName());
         dto.setAddress(userProfile.getAddress());
         dto.setPhoneNumber(userProfile.getPhoneNumber());
