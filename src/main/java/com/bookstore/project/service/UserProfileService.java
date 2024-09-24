@@ -1,12 +1,11 @@
 package com.bookstore.project.service;
 
-import com.bookstore.project.dto.UserProfileDTO;
 import com.bookstore.project.entity.User;
-import com.bookstore.project.entity.UserProfile;
-import com.bookstore.project.repository.UserProfileRepository;
 import com.bookstore.project.repository.UserRepository;
+import com.bookstore.project.request.EditProfileRequest;
+import com.bookstore.project.request.UserProfileRequest;
+import com.bookstore.project.responses.UserProfileResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -15,67 +14,47 @@ import java.util.Optional;
 public class UserProfileService {
 
     @Autowired
-    private UserProfileRepository userProfileRepository;
-
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    public UserProfileDTO createUserProfile(UserProfileDTO userProfileDTO) {
-        Optional<User> user = userRepository.findById(userProfileDTO.getUserId());
+    public UserProfileResponse getUserProfile(Long userId) {
+        Optional<User> user = userRepository.findById(userId);
         if (user.isPresent()) {
-            UserProfile userProfile = new UserProfile();
-            userProfile.setUser(user.get());
-            userProfile.setFullName(userProfileDTO.getFullName());
-            userProfile.setAddress(userProfileDTO.getAddress());
-            userProfile.setPhoneNumber(userProfileDTO.getPhoneNumber());
-            userProfile.setBirthdate(userProfileDTO.getBirthdate());
-            UserProfile savedProfile = userProfileRepository.save(userProfile);
-            return convertToDTO(savedProfile);
-        } else {
-            throw new RuntimeException("User not found with id: " + userProfileDTO.getUserId());
+            User u = user.get();
+            UserProfileResponse response = new UserProfileResponse();
+            response.setId(u.getId());
+            response.setUsername(u.getUsername());
+            response.setEmail(u.getEmail());
+            response.setAddress(u.getAddress());
+            response.setPhoneNumber(u.getPhoneNumber());
+            response.setPicture(u.getPicture());
+            return response;
         }
+        return null;
     }
 
-    public UserProfileDTO updateUserProfile(long userId, UserProfileDTO userProfileDTO) {
-        Optional<UserProfile> existingProfile = userProfileRepository.findByUserId(userId);
-        if (existingProfile.isPresent()) {
-            UserProfile userProfile = existingProfile.get();
-            userProfile.setFullName(userProfileDTO.getFullName());
-            userProfile.setAddress(userProfileDTO.getAddress());
-            userProfile.setPhoneNumber(userProfileDTO.getPhoneNumber());
-            userProfile.setBirthdate(userProfileDTO.getBirthdate());
-            UserProfile updatedProfile = userProfileRepository.save(userProfile);
-            return convertToDTO(updatedProfile);
-        } else {
-            throw new RuntimeException("User profile not found for user id: " + userId);
+    public UserProfileResponse editUserProfile(Long userId, EditProfileRequest request) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            // Cập nhật thông tin người dùng
+            user.setEmail(request.getEmail());
+            user.setAddress(request.getAddress());
+            user.setPhoneNumber(request.getPhoneNumber());
+            user.setPicture(request.getPicture());
+
+            userRepository.save(user); // Lưu thông tin đã cập nhật
+
+            // Trả về thông tin đã chỉnh sửa dưới dạng response
+            UserProfileResponse response = new UserProfileResponse();
+            response.setId(user.getId());
+            response.setUsername(user.getUsername());
+            response.setEmail(user.getEmail());
+            response.setAddress(user.getAddress());
+            response.setPhoneNumber(user.getPhoneNumber());
+            response.setPicture(user.getPicture());
+            return response;
         }
-    }
-
-    public UserProfileDTO getUserProfile(long userId) {
-        Optional<UserProfile> userProfile = userProfileRepository.findByUserId(userId);
-        return userProfile.map(this::convertToDTO).orElse(null);
-    }
-
-    public void deleteUserProfile(long userId) {
-        Optional<UserProfile> userProfile = userProfileRepository.findByUserId(userId);
-        if (userProfile.isPresent()) {
-            userProfileRepository.delete(userProfile.get());
-        } else {
-            throw new RuntimeException("User profile not found for user id: " + userId);
-        }
-    }
-
-    private UserProfileDTO convertToDTO(UserProfile userProfile) {
-        UserProfileDTO dto = new UserProfileDTO();
-        dto.setId(userProfile.getId());
-        dto.setUserId(Math.toIntExact(userProfile.getUser().getId()));
-        dto.setFullName(userProfile.getFullName());
-        dto.setAddress(userProfile.getAddress());
-        dto.setPhoneNumber(userProfile.getPhoneNumber());
-        dto.setBirthdate(userProfile.getBirthdate());
-        return dto;
+        return null;
     }
 }
+
