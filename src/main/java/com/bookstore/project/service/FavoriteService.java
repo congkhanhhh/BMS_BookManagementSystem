@@ -26,8 +26,8 @@ public class FavoriteService {
     @Autowired
     private BookRepository bookRepository;
 
-    public void addFavorite(int userId, int bookId) {
-        User user = userRepository.findById(userId)
+    public void addFavorite(long userId, int bookId) {
+        User user = userRepository.findById( userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found with id: " + bookId));
@@ -42,7 +42,7 @@ public class FavoriteService {
         favoriteRepository.save(favorite);
     }
 
-    public void removeFavorite(int userId, int bookId) {
+    public void removeFavorite(long userId, int bookId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
@@ -55,7 +55,7 @@ public class FavoriteService {
         favoriteRepository.delete(favorite);
     }
 
-    public List<BookDTO> getFavorites(int userId) {
+    public List<BookDTO> getFavorites(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
@@ -72,7 +72,7 @@ public class FavoriteService {
                     dto.setPrice(book.getPrice());     // Nếu có trường price
                     dto.setGenreId(book.getGenre().getId());
                     dto.setGenreName(book.getGenre().getName()); // Lấy tên thể loại
-                    dto.setUserId(user.getId());       // Lấy ID người dùng
+                    dto.setUserId(Math.toIntExact(user.getId()));       // Lấy ID người dùng
                     dto.setCreatedAt(book.getCreated_at());
                     return dto;
                 })

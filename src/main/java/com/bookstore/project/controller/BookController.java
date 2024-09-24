@@ -81,6 +81,5 @@ public class BookController {
         List<String> bookTitles = bookService.getBookTitlesByGenreId(genreId);
         return ResponseEntity.ok(bookTitles);
     }
-
 }
 

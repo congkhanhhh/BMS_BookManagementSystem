@@ -1,15 +1,16 @@
 package com.bookstore.project.service;
 
-import com.bookstore.project.dto.ChangepasswordDTO;
-import com.bookstore.project.dto.UserDTO;
 import com.bookstore.project.entity.User;
-import com.bookstore.project.exception.ResourceNotFoundException;
 import com.bookstore.project.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -20,42 +21,53 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // Đăng ký người dùng mới
-    public User signup(UserDTO userDTO) {
-        User user = new User();
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword())); // Mã hóa password
-        user.setRoleId(userDTO.getRoleId());
-        user.setEnable(true); // Kích hoạt tài khoản
-        user.setCreateAt(LocalDate.now());
-        return userRepository.save(user);
-    }
 
-    // Xác thực người dùng khi login
-    public User login(String email, String password) {
-        User user = userRepository.findByEmail(email);
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            return user; // Xác thực thành công
-        }
-        return null; // Login thất bại
-    }
-
-    public void changePassword(Long userId, ChangepasswordDTO changePasswordDTO) {
-        User user = userRepository.findById(Math.toIntExact(userId))
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-
-        // Kiểm tra mật khẩu cũ
-        if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Old password is incorrect");
-        }
-
-        // Cập nhật mật khẩu mới
-        user.setPassword(passwordEncoder.encode(changePasswordDTO.getNewPassword()));
-        userRepository.save(user);
-    }
-
-    public boolean existsById(int userId) {
+    public boolean existsById(long userId) {
         return userRepository.existsById(userId);
     }
 
+    // Phương thức đăng ký người dùng
+    public User registerUser(User user) {
+        return userRepository.save(user);
+    }
+
+    // Thay đổi mật khẩu
+    public boolean changePassword(Long userId, String newPassword) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return true;
+        }
+        return false;
+    }
+
+    // Cập nhật thông tin người dùng
+    public User updateProfile(Long userId, User updatedUser) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setUsername(updatedUser.getUsername());
+            user.setEmail(updatedUser.getEmail());
+            user.setAddress(updatedUser.getAddress());
+            user.setPhoneNumber(updatedUser.getPhoneNumber());
+            return userRepository.save(user);
+        }
+        return null;
+    }
+    // Phương thức để lấy tất cả người dùng
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    // Phương thức để xóa người dùng
+    public boolean deleteUser(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            userRepository.delete(optionalUser.get());
+            return true;
+        }
+        return false;
+    }
 }

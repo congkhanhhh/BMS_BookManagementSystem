@@ -3,6 +3,7 @@ package com.bookstore.project.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -16,7 +17,7 @@ public class BookDTO {
     private String author;
     private String description;
     private String picture;
-    private Double price;
+    private BigDecimal price;
     private int genreId;
     private String genreName;
     private int userId;

@@ -46,7 +46,7 @@ public class BookService {
         }
 
         // Map User
-        Optional<User> user = userRepository.findById(bookDTO.getUserId());
+        Optional<User> user = userRepository.findById((long) bookDTO.getUserId());
         if (user.isPresent()) {
             book.setUser(user.get());
         } else {
@@ -94,7 +94,7 @@ public class BookService {
         bookDTO.setPicture(book.getPicture());
         bookDTO.setPrice(book.getPrice());
         bookDTO.setGenreName(book.getGenre().getName());
-        bookDTO.setUserId(book.getUser().getId());
+        bookDTO.setUserId(Math.toIntExact(book.getUser().getId()));
         bookDTO.setCreatedAt(book.getCreated_at());
         return bookDTO;
     }
