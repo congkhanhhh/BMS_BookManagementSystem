@@ -28,7 +28,7 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html" ).permitAll()
                         // Allow public access to signup and login APIs
                         .requestMatchers(   "/api/books/**","/api/genres/**","/api/users/**",
-                                "/api/favorites/**","/api/orders/**","/api/profile/**","/api/user/reset-password").permitAll()
+                                "/api/favorites/**","/api/orders/**","/api/profile/**","/api/users/reset-password?token=").permitAll()
                         // Authenticate all other requests
                         .anyRequest().authenticated()
                 )
