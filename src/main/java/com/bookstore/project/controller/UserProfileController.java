@@ -14,7 +14,7 @@ public class UserProfileController {
     @Autowired
     private UserProfileService userProfileService;
 
-    @GetMapping("/")
+    @GetMapping("/{userId}")
     public ResponseEntity<UserProfileResponse> getUserProfile(@RequestParam Long userId) {
         UserProfileResponse response = userProfileService.getUserProfile(userId);
         if (response != null) {
