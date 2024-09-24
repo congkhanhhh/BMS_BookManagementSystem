@@ -21,6 +21,17 @@ public class BookController {
     @Autowired
     private UserService userService;
 
+
+    // Get a book by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getBookById(@PathVariable int id) {
+        Optional<BookDTO> book = bookService.getBookById(id);
+        if (book.isPresent()) {
+            return ResponseEntity.ok(book.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: Book not found");
+        }
+    }
     // Create a new book
     @PostMapping
     public ResponseEntity<BookDTO> createBook(@RequestBody BookDTO bookDTO) {
@@ -58,8 +69,6 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: Book not found");
         }
     }
-
-
 
     // Delete a book by ID
     @DeleteMapping("/{id}")
