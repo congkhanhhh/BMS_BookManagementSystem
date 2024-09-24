@@ -19,23 +19,31 @@ public class SecurityConfig {
 //        this.jwtRequestFilter = jwtRequestFilter;
 //        this.userDetailsService = userDetailsService;
 //    }
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())  // Disable CSRF protection for API endpoints
-                .authorizeHttpRequests(auth -> auth
-                        // Allow Swagger access without authentication
-                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html" ).permitAll()
-                        // Allow public access to signup and login APIs
-                        .requestMatchers(   "/api/books/**","/api/genres/**","/api/users/**",
-                                "/api/favorites/**","/api/orders/**","/api/profile/**","/api/users/reset-password?token=").permitAll()
-                        // Authenticate all other requests
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form.disable())  // Disable the default login form since you are using API-based authentication (e.g., JWT)
-                .httpBasic(httpBasic -> httpBasic.disable());  // Disable HTTP Basic Authentication
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+            .csrf(csrf -> csrf.disable())  // Tắt bảo vệ CSRF cho các endpoint API
+            .authorizeHttpRequests(auth -> auth
+                    // Cho phép truy cập Swagger mà không cần xác thực
+                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                    // Cho phép truy cập công khai cho các API
+                    .requestMatchers("/api/users/reset-password/**").permitAll()
+                    .requestMatchers(
+                            "/api/books/**",
+                            "/api/genres/**",
+                            "/api/users/**",
+                            "/api/favorites/**",
+                            "/api/orders/**",
+                            "/api/profile/**"
+                              // Sửa đây để cho phép toàn bộ path cho reset-password
+                    ).permitAll()
+                    // Xác thực tất cả các yêu cầu khác
+                    .anyRequest().authenticated()
+            )
+            .formLogin(form -> form.disable())  // Tắt form đăng nhập mặc định vì bạn sử dụng xác thực dựa trên API (ví dụ: JWT)
+            .httpBasic(httpBasic -> httpBasic.disable());  // Tắt xác thực HTTP Basic
 
-        return http.build();
+    return http.build();
     }
 
     @Bean
