@@ -40,7 +40,7 @@ public class BookController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<?> getBooksByUserId(@PathVariable int userId) {
+    public ResponseEntity<?> getBooksByUserId(@PathVariable long userId) {
         if (!userService.existsById(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("User with ID " + userId + " not found.");
         }

@@ -5,6 +5,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
+
 public class UserProfileRequest {
-    private Long userId;
+    private String username;
+    private String email;
+    private String address;
+    private String phoneNumber;
+    private String picture;
 }

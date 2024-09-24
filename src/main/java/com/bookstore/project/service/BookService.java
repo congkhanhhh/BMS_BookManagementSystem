@@ -69,7 +69,7 @@ public class BookService {
     }
 
     // Find books by userId
-    public List<BookDTO> getBooksByUserId(int userId) {
+    public List<BookDTO> getBooksByUserId(long userId) {
         List<Book> books = bookRepository.findByUserId(userId);
         return books.stream().map(this::mapToDTO).collect(Collectors.toList());
     }

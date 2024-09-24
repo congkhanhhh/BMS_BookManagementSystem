@@ -51,7 +51,7 @@ public class User {
     private String resetToken;
 
     @Column(name = "token_expiration")
-    private Date tokenExpiration;
+    private LocalDateTime tokenExpiration;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(

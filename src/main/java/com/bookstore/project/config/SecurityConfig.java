@@ -13,13 +13,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfig {
-    private final JwtRequestFilter jwtRequestFilter;
-    private final UserDetailsService userDetailsService;
-
-    public SecurityConfig(JwtRequestFilter jwtRequestFilter, UserDetailsService userDetailsService) {
-        this.jwtRequestFilter = jwtRequestFilter;
-        this.userDetailsService = userDetailsService;
-    }
+//    private final JwtRequestFilter jwtRequestFilter;
+//
+//    public SecurityConfig(JwtRequestFilter jwtRequestFilter, UserDetailsService userDetailsService) {
+//        this.jwtRequestFilter = jwtRequestFilter;
+//        this.userDetailsService = userDetailsService;
+//    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -27,12 +26,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Allow Swagger access without authentication
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html" ).permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
                         // Allow public access to signup and login APIs
-                        .requestMatchers(   "/api/books/**","/api/genres/**","/api/users/**","/api/favorites/**","/api/orders/**","/api/profile/**").permitAll()
+                        .requestMatchers(   "/api/books/**","/api/genres/**","/api/users/**",
+                                "/api/favorites/**","/api/orders/**","/api/profile/**","/api/user/reset-password").permitAll()
                         // Authenticate all other requests
                         .anyRequest().authenticated()
-                ).addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                )
                 .formLogin(form -> form.disable())  // Disable the default login form since you are using API-based authentication (e.g., JWT)
                 .httpBasic(httpBasic -> httpBasic.disable());  // Disable HTTP Basic Authentication
 

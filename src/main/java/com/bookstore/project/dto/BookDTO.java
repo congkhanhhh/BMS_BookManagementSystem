@@ -20,7 +20,7 @@ public class BookDTO {
     private BigDecimal price;
     private int genreId;
     private String genreName;
-    private int userId;
+    private long userId;
     private LocalDate createdAt;
 }
 
