@@ -1,8 +1,7 @@
 package com.bookstore.project.controller;
 
-import com.bookstore.project.dto.BookDTO;
-import com.bookstore.project.entity.Book;
 import com.bookstore.project.exception.ResourceNotFoundException;
+import com.bookstore.project.responses.BookResponse;
 import com.bookstore.project.service.FavoriteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,9 +34,10 @@ public class FavoriteController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<BookDTO>> getFavorites(@PathVariable int userId) {
-        List<BookDTO> favorites = favoriteService.getFavorites(userId);
+    public ResponseEntity<List<BookResponse>> getFavorites(@PathVariable int userId) {
+        List<BookResponse> favorites = favoriteService.getFavorites(userId);
         return ResponseEntity.ok(favorites);
     }
+
 }
 

@@ -27,7 +27,7 @@ public class GenreService {
             return genreRepository.findAll();
         }
 
-        public Optional<Genre> getGenreById(int id) {
+        public Optional<Genre> getGenreById(long id) {
             return genreRepository.findById(id);
         }
 
@@ -35,7 +35,7 @@ public class GenreService {
             return genreRepository.save(genre);
         }
 
-        public void deleteGenre(int id) {
+        public void deleteGenre(long id) {
             genreRepository.deleteById(id);
         }
     }

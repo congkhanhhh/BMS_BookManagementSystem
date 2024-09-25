@@ -1,26 +1,21 @@
-package com.bookstore.project.dto;
+package com.bookstore.project.responses;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
-
 
 @Getter
 @Setter
-public class BookDTO {
-
-    private int id;
+public class BookResponse {
+    private long id;
     private String title;
     private String author;
     private String description;
     private String picture;
     private BigDecimal price;
-    private int genreId;
-    private String genreName;
-    private long userId;
+    private String genreName; // You can show the genre name instead of ID
+    private String username;  // Display the user who added the book
     private LocalDate createdAt;
 }
-

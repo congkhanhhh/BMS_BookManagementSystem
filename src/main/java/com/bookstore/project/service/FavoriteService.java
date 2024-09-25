@@ -1,6 +1,5 @@
 package com.bookstore.project.service;
 
-import com.bookstore.project.dto.BookDTO;
 import com.bookstore.project.entity.Book;
 import com.bookstore.project.entity.Favorite;
 import com.bookstore.project.entity.User;
@@ -8,6 +7,7 @@ import com.bookstore.project.exception.ResourceNotFoundException;
 import com.bookstore.project.repository.BookRepository;
 import com.bookstore.project.repository.FavoriteRepository;
 import com.bookstore.project.repository.UserRepository;
+import com.bookstore.project.responses.BookResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class FavoriteService {
     @Autowired
     private BookRepository bookRepository;
 
-    public void addFavorite(long userId, int bookId) {
+    public void addFavorite(long userId, long bookId) {
         User user = userRepository.findById( userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
         Book book = bookRepository.findById(bookId)
@@ -42,7 +42,7 @@ public class FavoriteService {
         favoriteRepository.save(favorite);
     }
 
-    public void removeFavorite(long userId, int bookId) {
+    public void removeFavorite(long userId, long bookId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
@@ -55,38 +55,29 @@ public class FavoriteService {
         favoriteRepository.delete(favorite);
     }
 
-    public List<BookDTO> getFavorites(long userId) {
+    public List<BookResponse> getFavorites(long userId) {
+        // Fetch the user by ID and handle if the user is not found
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
+        // Fetch the user's favorite books and map them to BookResponse
         return favoriteRepository.findByUser(user).stream()
                 .map(favorite -> {
                     Book book = favorite.getBook();
-                    // Tạo BookDTO từ entity Book
-                    BookDTO dto = new BookDTO();
-                    dto.setId(book.getId());
-                    dto.setTitle(book.getTitle());
-                    dto.setAuthor(book.getAuthor());
-                    dto.setDescription(book.getDescription());
-                    dto.setPicture(book.getPicture()); // Nếu có trường picture
-                    dto.setPrice(book.getPrice());     // Nếu có trường price
-                    dto.setGenreId(book.getGenre().getId());
-                    dto.setGenreName(book.getGenre().getName()); // Lấy tên thể loại
-                    dto.setUserId(Math.toIntExact(user.getId()));       // Lấy ID người dùng
-                    dto.setCreatedAt(book.getCreated_at());
-                    return dto;
+
+                    // Map Book entity to BookResponse
+                    BookResponse response = new BookResponse();
+                    response.setId(book.getId());
+                    response.setTitle(book.getTitle());
+                    response.setAuthor(book.getAuthor());
+                    response.setDescription(book.getDescription());
+                    response.setPicture(book.getPicture()); // Set picture if available
+                    response.setPrice(book.getPrice());     // Set price if available
+                    response.setGenreName(book.getGenre().getName()); // Set genre name
+                    response.setUsername(user.getUsername()); // Set user’s username
+                    response.setCreatedAt(book.getCreated_at()); // Set created date
+                    return response;
                 })
                 .collect(Collectors.toList());
-    }
-
-    private BookDTO convertToDTO(Book book) {
-        BookDTO dto = new BookDTO();
-        dto.setId(book.getId());
-        dto.setTitle(book.getTitle());
-        dto.setAuthor(book.getAuthor());
-        dto.setDescription(book.getDescription());
-        dto.setGenreName(book.getGenre() != null ? book.getGenre().getName() : null); // Nếu bạn có thông tin genre
-
-        return dto;
     }
 }

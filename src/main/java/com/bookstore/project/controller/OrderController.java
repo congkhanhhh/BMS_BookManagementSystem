@@ -1,6 +1,5 @@
 package com.bookstore.project.controller;
 
-import com.bookstore.project.entity.Order;
 import com.bookstore.project.request.OrderRequest;
 import com.bookstore.project.responses.OrderResponse;
 import com.bookstore.project.service.OrderService;
@@ -22,23 +21,24 @@ public class OrderController {
         OrderResponse orderResponse = orderService.createOrder(orderRequest);
         return ResponseEntity.ok(orderResponse);
     }
+    // Get all orders
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
-        List<Order> orders = orderService.getAllOrders();
+    public ResponseEntity<List<OrderResponse>> getAllOrders() {
+        List<OrderResponse> orders = orderService.getAllOrders();
         return ResponseEntity.ok(orders);
     }
 
     // Get order by ID
     @GetMapping("/{orderId}")
-    public ResponseEntity<Order> getOrderById(@PathVariable Long orderId) {
-        Order order = orderService.getOrderById(orderId);
-        return ResponseEntity.ok(order);
+    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long orderId) {
+        OrderResponse orderResponse = orderService.getOrderById(orderId); // Returns OrderResponse
+        return ResponseEntity.ok(orderResponse);
     }
 
-    // Search orders by customer name
+    // Search orders by username
     @GetMapping("/search")
-    public ResponseEntity<List<Order>> searchOrders(@RequestParam String customerName) {
-        List<Order> orders = orderService.searchOrders(customerName);
+    public ResponseEntity<List<OrderResponse>> searchOrders(@RequestParam String Username) {
+        List<OrderResponse> orders = orderService.searchOrders(Username); // Returns List of OrderResponse
         return ResponseEntity.ok(orders);
     }
 }

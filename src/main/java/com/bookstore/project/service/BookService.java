@@ -1,107 +1,123 @@
 package com.bookstore.project.service;
 
-import com.bookstore.project.dto.BookDTO;
 import com.bookstore.project.entity.Book;
 import com.bookstore.project.entity.Genre;
 import com.bookstore.project.entity.User;
 import com.bookstore.project.repository.BookRepository;
 import com.bookstore.project.repository.GenreRepository;
 import com.bookstore.project.repository.UserRepository;
+import com.bookstore.project.request.BookRequest;
+import com.bookstore.project.responses.BookResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class BookService {
+    public class BookService {
 
-    @Autowired
-    private BookRepository bookRepository;
+        @Autowired
+        private BookRepository bookRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+        @Autowired
+        private UserRepository userRepository;
 
-    @Autowired
-    private GenreRepository genreRepository;
+        @Autowired
+        private GenreRepository genreRepository;
 
-    // Create or Update a book
-    public BookDTO saveBook(BookDTO bookDTO) {
-        // Map BookDTO to Book entity
-        Book book = new Book();
-        book.setId(bookDTO.getId());
-        book.setTitle(bookDTO.getTitle());
-        book.setAuthor(bookDTO.getAuthor());
-        book.setDescription(bookDTO.getDescription());
-        book.setPicture(bookDTO.getPicture());
-        book.setPrice(bookDTO.getPrice());
+        // Create a new book
+        public BookResponse createBook(BookRequest bookRequest) {
+            Book book = new Book();
+            book.setTitle(bookRequest.getTitle());
+            book.setAuthor(bookRequest.getAuthor());
+            book.setDescription(bookRequest.getDescription());
+            book.setPicture(bookRequest.getPicture());
+            book.setPrice(bookRequest.getPrice());
 
-        // Map Genre
-        Optional<Genre> genre = genreRepository.findById(bookDTO.getGenreId());
-        if (genre.isPresent()) {
-            book.setGenre(genre.get());
-        } else {
-            throw new RuntimeException("Genre not found");
+            // Fetch Genre and User
+            Genre genre = genreRepository.findById(bookRequest.getGenreId())
+                    .orElseThrow(() -> new RuntimeException("Genre not found"));
+            User user = userRepository.findById(bookRequest.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            book.setGenre(genre);
+            book.setUser(user);
+            book.setCreated_at(LocalDate.now());
+
+            Book savedBook = bookRepository.save(book);
+            return mapToBookResponse(savedBook);
         }
 
-        // Map User
-        Optional<User> user = userRepository.findById((long) bookDTO.getUserId());
-        if (user.isPresent()) {
-            book.setUser(user.get());
-        } else {
-            throw new RuntimeException("User not found");
+        // Get all books
+        public List<BookResponse> getAllBooks() {
+            List<Book> books = bookRepository.findAll();
+            return books.stream().map(this::mapToBookResponse).collect(Collectors.toList());
         }
 
-        book.setCreated_at(bookDTO.getCreatedAt());
+        // Get a book by ID
+        public BookResponse getBookById(long id) {
+            Book book = bookRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Book not found"));
+            return mapToBookResponse(book);
+        }
 
-        // Save the book entity
-        Book savedBook = bookRepository.save(book);
+        // Get books by user ID
+        public List<BookResponse> getBooksByUserId(long userId) {
+            List<Book> books = bookRepository.findByUserId(userId);
+            return books.stream().map(this::mapToBookResponse).collect(Collectors.toList());
+        }
 
-        // Convert back to BookDTO and return
-        return mapToDTO(savedBook);
+        // Update a book
+        public BookResponse updateBook(long id, BookRequest bookRequest) {
+            Book book = bookRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Book not found"));
+
+            book.setTitle(bookRequest.getTitle());
+            book.setAuthor(bookRequest.getAuthor());
+            book.setDescription(bookRequest.getDescription());
+            book.setPicture(bookRequest.getPicture());
+            book.setPrice(bookRequest.getPrice());
+
+            // Fetch Genre and User if necessary
+            Genre genre = genreRepository.findById(bookRequest.getGenreId())
+                    .orElseThrow(() -> new RuntimeException("Genre not found"));
+            User user = userRepository.findById(bookRequest.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            book.setGenre(genre);
+            book.setUser(user);
+
+            Book updatedBook = bookRepository.save(book);
+            return mapToBookResponse(updatedBook);
+        }
+
+        // Delete a book by ID
+        public void deleteBook(long id) {
+            Book book = bookRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Book not found"));
+            bookRepository.delete(book);
+        }
+        // Get books by genre ID
+        public List<BookResponse> getBooksByGenreId(int genreId) {
+            List<Book> books = bookRepository.findByGenreId(genreId);
+            return books.stream().map(this::mapToBookResponse).collect(Collectors.toList());
+        }
+
+        // Utility method to map Book entity to BookResponse DTO
+        private BookResponse mapToBookResponse(Book book) {
+            BookResponse response = new BookResponse();
+            response.setId(book.getId());
+            response.setTitle(book.getTitle());
+            response.setAuthor(book.getAuthor());
+            response.setDescription(book.getDescription());
+            response.setPicture(book.getPicture());
+            response.setPrice(book.getPrice());
+            response.setGenreName(book.getGenre().getName());
+            response.setUsername(book.getUser().getUsername());
+            response.setCreatedAt(book.getCreated_at());
+            return response;
+        }
+
     }
-
-    // Get a book by ID
-    public Optional<BookDTO> getBookById(int id) {
-        Optional<Book> book = bookRepository.findById(id);
-        return book.map(this::mapToDTO);
-    }
-
-    // Find books by userId
-    public List<BookDTO> getBooksByUserId(long userId) {
-        List<Book> books = bookRepository.findByUserId(userId);
-        return books.stream().map(this::mapToDTO).collect(Collectors.toList());
-    }
-
-    // Get all books
-    public List<BookDTO> getAllBooks() {
-        return bookRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
-    }
-
-    // Delete a book by ID
-    public void deleteBook(int id) {
-        bookRepository.deleteById(id);
-    }
-
-    // Utility to convert Book to BookDTO
-    private BookDTO mapToDTO(Book book) {
-        BookDTO bookDTO = new BookDTO();
-        bookDTO.setId(book.getId());
-        bookDTO.setTitle(book.getTitle());
-        bookDTO.setAuthor(book.getAuthor());
-        bookDTO.setDescription(book.getDescription());
-        bookDTO.setPicture(book.getPicture());
-        bookDTO.setPrice(book.getPrice());
-        bookDTO.setGenreName(book.getGenre().getName());
-        bookDTO.setUserId(Math.toIntExact(book.getUser().getId()));
-        bookDTO.setCreatedAt(book.getCreated_at());
-        return bookDTO;
-    }
-
-    // Get book titles by genreId
-    public List<String> getBookTitlesByGenreId(int genreId) {
-        List<Book> books = bookRepository.findByGenreId(genreId);
-        return books.stream().map(Book::getTitle).collect(Collectors.toList());
-    }
-}

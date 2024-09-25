@@ -8,6 +8,7 @@ import com.bookstore.project.entity.User;
 import com.bookstore.project.repository.BookRepository;
 import com.bookstore.project.repository.OrderItemRepository;
 import com.bookstore.project.repository.OrderRepository;
+import com.bookstore.project.repository.UserRepository;
 import com.bookstore.project.request.OrderItemRequest;
 import com.bookstore.project.request.OrderRequest;
 import com.bookstore.project.responses.OrderItemResponse;
@@ -33,48 +34,100 @@ public class OrderService {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Transactional
     public OrderResponse createOrder(OrderRequest orderRequest) {
         // Create new Order entity
         Order order = new Order();
-        order.setUser(new User());  // Assuming customer exists
+
+        // Find the user (customer) based on the request's userId and set the user
+        User user = userRepository.findById(orderRequest.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + orderRequest.getUserId()));
+
+        order.setUser(user);  // Assign user to order
         order.setOrderDate(new Date());
-        order.setTotalPrice(BigDecimal.ZERO);  // Set to zero initially
+        order.setTotalPrice(BigDecimal.ZERO);  // Initially set total price to zero
 
         BigDecimal totalPrice = BigDecimal.ZERO;
 
         // Process each order item from the request
         for (OrderItemRequest itemRequest : orderRequest.getOrderItems()) {
-            Book book = bookRepository.findById(Math.toIntExact(itemRequest.getBookId()))
-                    .orElseThrow(() -> new RuntimeException("Book not found"));
+            // Find book by ID from item request
+            Book book = bookRepository.findById(itemRequest.getBookId())
+                    .orElseThrow(() -> new RuntimeException("Book not found with id: " + itemRequest.getBookId()));
 
-            // Create new OrderItem entity
+            // Create new OrderItem entity and calculate price
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setBook(book);
             orderItem.setQuantity(itemRequest.getQuantity());
             orderItem.setPrice(book.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQuantity())));
 
+            // Add the price of this item to the total price
             totalPrice = totalPrice.add(orderItem.getPrice());
+
+            // Add the item to the order
             order.getOrderItems().add(orderItem);
         }
 
-        // Set the total price for the order
+        // Set the final total price for the order
         order.setTotalPrice(totalPrice);
 
-        // Save the order
+        // Save the order in the database
         orderRepository.save(order);
 
-        // Prepare response
+        // Prepare the OrderResponse with details
         OrderResponse orderResponse = new OrderResponse();
         orderResponse.setOrderId(order.getId());
         orderResponse.setOrderDate(order.getOrderDate());
         orderResponse.setTotalPrice(order.getTotalPrice());
 
-        // Map each OrderItem to the response
+        // Map the OrderItems to the response DTO
         List<OrderItemResponse> itemResponses = order.getOrderItems().stream().map(item -> {
             OrderItemResponse itemResponse = new OrderItemResponse();
-            itemResponse.setBookId((long) item.getBook().getId());
+            itemResponse.setBookId(item.getBook().getId());
+            itemResponse.setBookTitle(item.getBook().getTitle());
+            itemResponse.setQuantity(item.getQuantity());
+            itemResponse.setPrice(item.getPrice());
+            return itemResponse;
+        }).collect(Collectors.toList());
+
+        // Set the mapped order items in the response
+        orderResponse.setOrderItems(itemResponses);
+
+        return orderResponse;
+    }
+
+    public List<OrderResponse> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream().map(this::mapToOrderResponse).collect(Collectors.toList());
+    }
+
+
+    // Get order by ID
+    public OrderResponse getOrderById(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with id: " + orderId));
+        return mapToOrderResponse(order);
+    }
+
+
+    public List<OrderResponse> searchOrders(String userName) {
+        List<Order> orders = orderRepository.findByUserUsernameContainingIgnoreCase(userName);
+        return orders.stream().map(this::mapToOrderResponse).collect(Collectors.toList());
+    }
+
+    private OrderResponse mapToOrderResponse(Order order) {
+        OrderResponse orderResponse = new OrderResponse();
+        orderResponse.setOrderId(order.getId());
+        orderResponse.setOrderDate(order.getOrderDate());
+        orderResponse.setTotalPrice(order.getTotalPrice());
+
+        List<OrderItemResponse> itemResponses = order.getOrderItems().stream().map(item -> {
+            OrderItemResponse itemResponse = new OrderItemResponse();
+            itemResponse.setBookId(item.getBook().getId());
             itemResponse.setBookTitle(item.getBook().getTitle());
             itemResponse.setQuantity(item.getQuantity());
             itemResponse.setPrice(item.getPrice());
@@ -83,20 +136,6 @@ public class OrderService {
 
         orderResponse.setOrderItems(itemResponses);
         return orderResponse;
-    }
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
-    }
-
-    // Get order by ID
-    public Order getOrderById(Long orderId) {
-        return orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-    }
-
-    // Search orders by customer name
-    public List<Order> searchOrders(String userName) {
-        return orderRepository.findByUserUsernameContainingIgnoreCase(userName);
     }
 }
 
