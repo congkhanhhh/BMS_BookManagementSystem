@@ -6,6 +6,8 @@ import com.bookstore.project.enumerated.Permission;
 import com.bookstore.project.request.BookRequest;
 import com.bookstore.project.responses.BookResponse;
 import com.bookstore.project.service.impl.BookServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin/books")
+
 public class BookController {
 
     @Autowired
@@ -30,6 +33,7 @@ public class BookController {
     // Get all books
     @GetMapping
     @HasPermission(Permission.ADMIN_VIEW_BOOK)
+    @Operation(summary = "Get list books", security = {@SecurityRequirement(name = "bearerAuth")})
     public ResponseEntity<List<BookResponse>> getAllBooks() {
         List<BookResponse> books = bookService.getAllBooks();
         return ResponseEntity.ok(books);

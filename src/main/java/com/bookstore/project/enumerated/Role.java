@@ -8,12 +8,12 @@ import org.springframework.security.core.GrantedAuthority;
 public enum Role implements GrantedAuthority {
     ADMIN, CUSTOMER;
 
-    public static final Permission[] ADMIN_PERMISSIONS = {
+    public static final Permission[] ADMIN_PERMISSIONS = new Permission[]{
             Permission.ADMIN_VIEW_BOOK,
             Permission.ADMIN_ADD_EDIT_BOOK
     };
 
-    public static final Permission[] CUSTOMER_PERMISSIONS = {
+    public static final Permission[] CUSTOMER_PERMISSIONS = new Permission[]{
             Permission.CUSTOMER_VIEW_BOOK
     };
 
