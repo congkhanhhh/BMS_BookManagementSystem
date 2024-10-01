@@ -1,9 +1,11 @@
 package com.bookstore.project.controller;
 
 
+import com.bookstore.project.aspect.HasPermission;
+import com.bookstore.project.enumerated.Permission;
 import com.bookstore.project.request.BookRequest;
 import com.bookstore.project.responses.BookResponse;
-import com.bookstore.project.service.BookService;
+import com.bookstore.project.service.impl.BookServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,14 +13,15 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/books")
+@RequestMapping("/api/v1/admin/books")
 public class BookController {
 
     @Autowired
-    private BookService bookService;
+    private BookServiceImpl bookService;
 
     // Create a new book
     @PostMapping
+    @HasPermission(Permission.ADMIN_ADD_EDIT_BOOK)
     public ResponseEntity<BookResponse> createBook(@RequestBody BookRequest bookRequest) {
         BookResponse bookResponse = bookService.createBook(bookRequest);
         return ResponseEntity.ok(bookResponse);
@@ -26,6 +29,7 @@ public class BookController {
 
     // Get all books
     @GetMapping
+    @HasPermission(Permission.ADMIN_VIEW_BOOK)
     public ResponseEntity<List<BookResponse>> getAllBooks() {
         List<BookResponse> books = bookService.getAllBooks();
         return ResponseEntity.ok(books);
@@ -33,6 +37,7 @@ public class BookController {
 
     // Get a book by ID
     @GetMapping("/{id}")
+    @HasPermission(Permission.ADMIN_VIEW_BOOK)
     public ResponseEntity<BookResponse> getBookById(@PathVariable int id) {
         BookResponse bookResponse = bookService.getBookById(id);
         return ResponseEntity.ok(bookResponse);
@@ -40,6 +45,7 @@ public class BookController {
 
     // Get books by user ID
     @GetMapping("/user/{userId}")
+    @HasPermission(Permission.ADMIN_VIEW_USER_BOOK)
     public ResponseEntity<List<BookResponse>> getBooksByUserId(@PathVariable int userId) {
         List<BookResponse> books = bookService.getBooksByUserId(userId);
         return ResponseEntity.ok(books);

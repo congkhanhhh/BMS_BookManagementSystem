@@ -11,5 +11,4 @@ public class UserProfileRequest {
     private String email;
     private String address;
     private String phoneNumber;
-    private String picture;
 }

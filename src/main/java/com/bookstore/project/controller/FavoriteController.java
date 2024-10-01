@@ -2,7 +2,7 @@ package com.bookstore.project.controller;
 
 import com.bookstore.project.exception.ResourceNotFoundException;
 import com.bookstore.project.responses.BookResponse;
-import com.bookstore.project.service.FavoriteService;
+import com.bookstore.project.service.impl.FavoriteServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,18 +15,18 @@ import java.util.List;
 public class FavoriteController {
 
     @Autowired
-    private FavoriteService favoriteService;
+    private FavoriteServiceImpl favoriteServiceImpl;
 
     @PostMapping("/{userId}/books/{bookId}")
     public ResponseEntity<Void> addFavorite(@PathVariable int userId, @PathVariable int bookId) {
-        favoriteService.addFavorite(userId, bookId);
+        favoriteServiceImpl.addFavorite(userId, bookId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/{userId}/books/{bookId}")
     public ResponseEntity<Void> removeFavorite(@PathVariable int userId, @PathVariable int bookId) {
         try {
-            favoriteService.removeFavorite(userId, bookId);
+            favoriteServiceImpl.removeFavorite(userId, bookId);
             return ResponseEntity.noContent().build();
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -35,7 +35,7 @@ public class FavoriteController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<List<BookResponse>> getFavorites(@PathVariable int userId) {
-        List<BookResponse> favorites = favoriteService.getFavorites(userId);
+        List<BookResponse> favorites = favoriteServiceImpl.getFavorites(userId);
         return ResponseEntity.ok(favorites);
     }
 

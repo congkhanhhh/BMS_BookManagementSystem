@@ -1,4 +1,4 @@
-package com.bookstore.project.service;
+package com.bookstore.project.service.impl;
 
 import com.bookstore.project.entity.Genre;
 import com.bookstore.project.repository.GenreRepository;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class GenreService {
+public class GenreServiceImpl {
 
     @Autowired
     private GenreRepository genreRepository;

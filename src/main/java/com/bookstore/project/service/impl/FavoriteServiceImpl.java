@@ -1,13 +1,14 @@
-package com.bookstore.project.service;
+package com.bookstore.project.service.impl;
 
 import com.bookstore.project.entity.Book;
 import com.bookstore.project.entity.Favorite;
 import com.bookstore.project.entity.User;
 import com.bookstore.project.exception.ResourceNotFoundException;
-import com.bookstore.project.repository.BookRepository;
 import com.bookstore.project.repository.FavoriteRepository;
 import com.bookstore.project.repository.UserRepository;
 import com.bookstore.project.responses.BookResponse;
+import com.bookstore.project.repository.BookRepository;
+import com.bookstore.project.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class FavoriteService {
+public class FavoriteServiceImpl {
 
     @Autowired
     private FavoriteRepository favoriteRepository;

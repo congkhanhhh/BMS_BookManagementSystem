@@ -1,32 +1,36 @@
-package com.bookstore.project.service;
+package com.bookstore.project.service.impl;
 
 
 import com.bookstore.project.entity.Book;
 import com.bookstore.project.entity.Order;
 import com.bookstore.project.entity.OrderItem;
 import com.bookstore.project.entity.User;
-import com.bookstore.project.repository.BookRepository;
-import com.bookstore.project.repository.OrderItemRepository;
 import com.bookstore.project.repository.OrderRepository;
 import com.bookstore.project.repository.UserRepository;
 import com.bookstore.project.request.OrderItemRequest;
 import com.bookstore.project.request.OrderRequest;
 import com.bookstore.project.responses.OrderItemResponse;
 import com.bookstore.project.responses.OrderResponse;
+import com.bookstore.project.repository.BookRepository;
+import com.bookstore.project.repository.OrderItemRepository;
+import com.bookstore.project.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class OrderService {
+public class OrderServiceImpl {
 
     @Autowired
-    private OrderRepository orderRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private OrderItemRepository orderItemRepository;
@@ -35,7 +39,10 @@ public class OrderService {
     private BookRepository bookRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Transactional
     public OrderResponse createOrder(OrderRequest orderRequest) {
@@ -47,44 +54,48 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + orderRequest.getUserId()));
 
         order.setUser(user);  // Assign user to order
+
+        // Set the order date
         order.setOrderDate(new Date());
-        order.setTotalPrice(BigDecimal.ZERO);  // Initially set total price to zero
 
         BigDecimal totalPrice = BigDecimal.ZERO;
 
         // Process each order item from the request
         for (OrderItemRequest itemRequest : orderRequest.getOrderItems()) {
-            // Find book by ID from item request
             Book book = bookRepository.findById(itemRequest.getBookId())
                     .orElseThrow(() -> new RuntimeException("Book not found with id: " + itemRequest.getBookId()));
 
-            // Create new OrderItem entity and calculate price
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setBook(book);
             orderItem.setQuantity(itemRequest.getQuantity());
-            orderItem.setPrice(book.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQuantity())));
 
-            // Add the price of this item to the total price
-            totalPrice = totalPrice.add(orderItem.getPrice());
+            BigDecimal itemPrice = book.getPrice().multiply(BigDecimal.valueOf(itemRequest.getQuantity()));
+            orderItem.setPrice(itemPrice);
 
-            // Add the item to the order
+            totalPrice = totalPrice.add(itemPrice);
+
             order.getOrderItems().add(orderItem);
         }
 
-        // Set the final total price for the order
         order.setTotalPrice(totalPrice);
-
-        // Save the order in the database
         orderRepository.save(order);
 
-        // Prepare the OrderResponse with details
+        // Prepare the OrderResponse with formatted date
         OrderResponse orderResponse = new OrderResponse();
         orderResponse.setOrderId(order.getId());
-        orderResponse.setOrderDate(order.getOrderDate());
+
+        // Convert the Date or Timestamp to LocalDateTime and format it
+        LocalDateTime localDateTime = order.getOrderDate().toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDateTime();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+        String formattedOrderDate = localDateTime.format(formatter);
+
+        // Set the formatted order date
+        orderResponse.setOrderDate(formattedOrderDate);
+
         orderResponse.setTotalPrice(order.getTotalPrice());
 
-        // Map the OrderItems to the response DTO
         List<OrderItemResponse> itemResponses = order.getOrderItems().stream().map(item -> {
             OrderItemResponse itemResponse = new OrderItemResponse();
             itemResponse.setBookId(item.getBook().getId());
@@ -94,11 +105,12 @@ public class OrderService {
             return itemResponse;
         }).collect(Collectors.toList());
 
-        // Set the mapped order items in the response
         orderResponse.setOrderItems(itemResponses);
 
         return orderResponse;
     }
+
+
 
     public List<OrderResponse> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
@@ -122,7 +134,16 @@ public class OrderService {
     private OrderResponse mapToOrderResponse(Order order) {
         OrderResponse orderResponse = new OrderResponse();
         orderResponse.setOrderId(order.getId());
-        orderResponse.setOrderDate(order.getOrderDate());
+
+        // Convert the Date to LocalDateTime and format it
+        LocalDateTime localDateTime = order.getOrderDate().toInstant()
+                .atZone(ZoneId.systemDefault()).toLocalDateTime();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+        String formattedOrderDate = localDateTime.format(formatter);
+
+        // Set the formatted order date
+        orderResponse.setOrderDate(formattedOrderDate);
+
         orderResponse.setTotalPrice(order.getTotalPrice());
 
         List<OrderItemResponse> itemResponses = order.getOrderItems().stream().map(item -> {

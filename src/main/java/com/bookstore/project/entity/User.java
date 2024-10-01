@@ -1,5 +1,6 @@
 package com.bookstore.project.entity;
 
+import com.bookstore.project.enumerated.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,15 +35,16 @@ public class User {
     @Column(name = "phone_number", length = 45)
     private String phoneNumber;
 
-    @Column(name = "picture")
-    private String picture;
+    @Lob
+    @Column(name = "profile", nullable = true)
+    private byte[] profile;
 
     @Column(name = "enable", nullable = false)
     private boolean enable;
 
-    @Column(name = "role_id")
-    private Integer roleId; // Sử dụng Integer thay vì int
-
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Column(name = "create_at", nullable = false)
     private LocalDate createAt;
@@ -52,14 +54,6 @@ public class User {
 
     @Column(name = "token_expiration")
     private LocalDateTime tokenExpiration;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Book> books = new HashSet<>();

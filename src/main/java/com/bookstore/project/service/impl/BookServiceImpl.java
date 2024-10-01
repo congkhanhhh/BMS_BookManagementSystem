@@ -1,13 +1,13 @@
-package com.bookstore.project.service;
+package com.bookstore.project.service.impl;
 
 import com.bookstore.project.entity.Book;
 import com.bookstore.project.entity.Genre;
 import com.bookstore.project.entity.User;
-import com.bookstore.project.repository.BookRepository;
 import com.bookstore.project.repository.GenreRepository;
 import com.bookstore.project.repository.UserRepository;
 import com.bookstore.project.request.BookRequest;
 import com.bookstore.project.responses.BookResponse;
+import com.bookstore.project.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +16,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-    public class BookService {
-
-        @Autowired
-        private BookRepository bookRepository;
-
-        @Autowired
-        private UserRepository userRepository;
-
-        @Autowired
-        private GenreRepository genreRepository;
+public class BookServiceImpl {
+    @Autowired
+    private GenreRepository genreRepository;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private BookRepository bookRepository;
 
         // Create a new book
         public BookResponse createBook(BookRequest bookRequest) {
@@ -119,5 +116,4 @@ import java.util.stream.Collectors;
             response.setCreatedAt(book.getCreated_at());
             return response;
         }
-
     }
