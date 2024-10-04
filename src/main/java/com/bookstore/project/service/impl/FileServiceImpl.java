@@ -13,12 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 
 @Service
 @Slf4j
@@ -28,6 +26,46 @@ public class FileServiceImpl implements FileService {
 
     @Autowired
     private AppConfig appConfig;
+
+
+    @Override
+    public FileInfo uploadImage(MultipartFile multipartFile) {
+
+        User currentUser = userService.getCurrentUser();
+
+        if (multipartFile.isEmpty()) {
+            throw RestException.badRequest("Failed to upload empty file");
+        }
+
+        String name = Optional.ofNullable(multipartFile.getOriginalFilename())
+                .orElseThrow(() -> RestException.badRequest("File name is not provided"));
+
+        String extension = getFileExtension(name)
+                .orElseThrow(() -> RestException.badRequest("File extension is not supported"));
+
+        List<String> supportedExtensions = List.of("jpg", "jpeg", "png");
+        if (!supportedExtensions.contains(extension)) {
+            throw RestException.badRequest("File extension is not supported");
+        }
+
+        String path = String.format("%s/users/%s", appConfig.getUploadPath(), currentUser.getId());
+        return uploadFile(path, multipartFile);
+    }
+    
+    @Override
+    public boolean deleteImage(String path) {
+        // Lấy người dùng hiện tại từ Optional<User>
+        User currentUser = userService.getCurrentUser(); // Ném ngoại lệ nếu không tìm thấy người dùng
+
+        String checkPath = String.format("%s/users/%s", appConfig.getUploadPath(), currentUser.getId());
+
+        // Kiểm tra xem đường dẫn có hợp lệ không
+        if (StringUtils.isEmpty(path) || !path.contains(checkPath)) {
+            throw RestException.badRequest("Cannot delete file");
+        }
+
+        return deleteFile(path); // Gọi phương thức để xóa file
+    }
 
     @Override
     public FileInfo uploadFileExcel(MultipartFile multipartFile) {
@@ -49,34 +87,6 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FileInfo uploadFile(String path, MultipartFile multipartFile) {
-
-        FileInfo fileInfo = new FileInfo();
-        if (multipartFile.isEmpty()) {
-            throw RestException.badRequest("Failed to upload empty file");
-        }
-
-        String originalFilename = multipartFile.getOriginalFilename();
-        String extension = getFileExtension(originalFilename).orElseThrow(() -> RestException.badRequest("File extension is not supported"));
-
-        try {
-            String name = UUID.randomUUID() + "." + extension;
-            mkdirs(appConfig.getUploadDir() + path);
-
-            fileInfo.setName(originalFilename);
-            fileInfo.setSize(multipartFile.getSize() / 1024);
-            fileInfo.setUrl(path + "/" + name);
-
-            log.debug("Write file {} to {}", name, appConfig.getUploadDir() + path);
-            Files.copy(multipartFile.getInputStream(), Paths.get(appConfig.getUploadDir() + path + "/" + name), StandardCopyOption.REPLACE_EXISTING);
-        } catch (Exception e) {
-            throw RestException.internalServerError();
-        }
-
-        return fileInfo;
-    }
-
-    @Override
     public boolean deleteFile(String path) {
         try {
             log.debug("Delete file {}", appConfig.getUploadDir() + path);
@@ -90,38 +100,23 @@ public class FileServiceImpl implements FileService {
         return false;
     }
 
-    @Override
-    public FileInfo uploadImage(MultipartFile multipartFile) {
+    public FileInfo uploadFile(String path, MultipartFile file) {
+        try {
+            // Tạo thư mục nếu chưa tồn tại
+            File directory = new File(path);
+            if (!directory.exists()) {
+                directory.mkdirs(); // Tạo thư mục nếu nó chưa tồn tại
+            }
 
-        User currentUser = userService.getCurrentUser();
+            // Lưu file vào thư mục
+            File newFile = new File(directory, file.getOriginalFilename());
+            file.transferTo(newFile); // Lưu file vào hệ thống
 
-        if (multipartFile.isEmpty()) {
-            throw RestException.badRequest("Failed to upload empty file");
+            // Trả về thông tin file đã tải lên
+            return new FileInfo(newFile.getName(), newFile.getAbsolutePath());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload file", e);
         }
-
-        String name = multipartFile.getOriginalFilename();
-        String extension = getFileExtension(name).orElseThrow(() -> RestException.badRequest("File extension is not supported"));
-
-        if (!List.of("jpg", "jpeg", "png").contains(extension)) {
-            throw RestException.badRequest("File extension is not supported");
-        }
-
-        String path = String.format("%s/users/%s", appConfig.getUploadPath(), currentUser.getId());
-        return uploadFile(path, multipartFile);
-    }
-
-    @Override
-    public boolean deleteImage(String path) {
-
-        User currentUser = userService.getCurrentUser();
-        String checkPath = String.format("%s/users/%s", appConfig.getUploadPath(), currentUser.getId());
-
-        // warning
-        if (StringUtils.isEmpty(path) || !path.contains(checkPath)) {
-            throw RestException.badRequest("Cannot delete file");
-        }
-
-        return deleteFile(path);
     }
 
     private Optional<String> getFileExtension(String filename) {

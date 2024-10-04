@@ -13,7 +13,7 @@ public class BookResponse {
     private String title;
     private String author;
     private String description;
-    private String picture;
+    private String imageUrl;
     private BigDecimal price;
     private String genreName; // You can show the genre name instead of ID
     private String username;  // Display the user who added the book

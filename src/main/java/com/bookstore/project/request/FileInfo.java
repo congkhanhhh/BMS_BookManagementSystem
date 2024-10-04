@@ -9,9 +9,9 @@ import java.io.Serializable;
 @Getter
 public class FileInfo implements Serializable {
 
-    private String name;
+    private String fileName;
+    private String path;
 
-    private String url;
-
-    private Long size;
+    public FileInfo(String name, String absolutePath) {
+    }
 }

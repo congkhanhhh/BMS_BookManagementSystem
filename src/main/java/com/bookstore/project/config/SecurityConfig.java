@@ -40,7 +40,6 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
                     .requestMatchers("/api/v1/public/**").permitAll()
                     .requestMatchers("/api/v1/open/**").permitAll()
                     // Các endpoint dành cho CUSTOMER
-                    .requestMatchers("/api/v1/customer/**").hasRole("CUSTOMER")
                     .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
             )

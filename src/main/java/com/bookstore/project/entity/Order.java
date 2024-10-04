@@ -14,6 +14,7 @@ import java.util.List;
 @Setter
 @Table(name = "`order`")
 public class Order {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,13 +24,14 @@ public class Order {
     private User user;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "order_date")
+    @Column(name = "order_date", nullable = false)
     private Date orderDate;
 
-    @Column(name = "total_price")
+    @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 }
+
 

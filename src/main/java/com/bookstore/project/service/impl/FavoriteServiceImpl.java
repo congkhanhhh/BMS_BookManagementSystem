@@ -72,7 +72,7 @@ public class FavoriteServiceImpl {
                     response.setTitle(book.getTitle());
                     response.setAuthor(book.getAuthor());
                     response.setDescription(book.getDescription());
-                    response.setPicture(book.getPicture()); // Set picture if available
+                    response.setImageUrl(book.getImageUrl()); // Set picture if available
                     response.setPrice(book.getPrice());     // Set price if available
                     response.setGenreName(book.getGenre().getName()); // Set genre name
                     response.setUsername(user.getUsername()); // Set user’s username

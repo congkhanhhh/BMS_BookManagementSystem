@@ -8,7 +8,6 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class SwaggerConfig {
@@ -27,14 +26,6 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("Admin API specs")
                 .pathsToMatch("/api/v*/admin/**")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi customerApi() {
-        return GroupedOpenApi.builder()
-                .group("Customer API specs")
-                .pathsToMatch("/api/v*/customer/**")
                 .build();
     }
 

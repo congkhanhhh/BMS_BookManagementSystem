@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/public/users")
@@ -56,7 +57,7 @@ public class UserController {
     }
 
     // Lấy thông tin hồ sơ người dùng (Chỉ dành cho người dùng đã đăng nhập với vai trò CUSTOMER)
-    @PreAuthorize("hasRole('CUSTOMER')")
+
     @GetMapping("/profile/{id}")
     public ResponseEntity<UserProfileResponse> getUserProfile(@PathVariable Long id) {
         UserProfileResponse userProfile = authService.getUserProfile(id);
@@ -68,7 +69,7 @@ public class UserController {
     }
 
     // Chỉnh sửa hồ sơ người dùng (Chỉ dành cho người dùng đã đăng nhập với vai trò CUSTOMER)
-    @PreAuthorize("hasRole('CUSTOMER')")
+
     @PutMapping("/profile/{id}")
     public ResponseEntity<UserProfileResponse> editUserProfile(@PathVariable Long id, @RequestBody UserProfileRequest userProfileRequest) {
         UserProfileResponse updatedProfile = authService.editUserProfile(id, userProfileRequest);
@@ -78,5 +79,6 @@ public class UserController {
             return ResponseEntity.status(404).body(null); // Not Found nếu không chỉnh sửa được
         }
     }
+
 }
 

@@ -5,6 +5,7 @@ import com.bookstore.project.request.RegisterRequest;
 import com.bookstore.project.request.UserProfileRequest;
 import com.bookstore.project.responses.UserProfileResponse;
 import com.bookstore.project.responses.UserResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface AuthService {
     UserResponse register(RegisterRequest registerRequest);

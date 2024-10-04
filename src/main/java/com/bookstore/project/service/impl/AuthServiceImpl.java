@@ -1,5 +1,6 @@
 package com.bookstore.project.service.impl;
 
+import com.bookstore.project.config.AppConfig;
 import com.bookstore.project.entity.User;
 import com.bookstore.project.repository.UserRepository;
 import com.bookstore.project.request.LoginRequest;
@@ -13,13 +14,16 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+
     @Autowired
     private UserRepository userRepo;
 
@@ -28,6 +32,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private AppConfig appConfig;
 
     public UserResponse register(RegisterRequest registerRequest) {
         User user = new User();
@@ -128,6 +135,7 @@ public class AuthServiceImpl implements AuthService {
         }
         return null;
     }
+
 
     // Chuyển đổi từ User entity sang UserProfileResponseDTO
     private UserProfileResponse convertToUserProfileResponseDTO(User user) {

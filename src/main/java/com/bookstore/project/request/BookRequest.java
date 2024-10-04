@@ -17,7 +17,7 @@ public class BookRequest {
 
     private String description;
 
-    private String picture;
+    private String imageUrl;
 
     @NotNull
     private BigDecimal price;

@@ -3,28 +3,17 @@ package com.bookstore.project.service.impl;
 import com.bookstore.project.entity.User;
 import com.bookstore.project.exception.RestException;
 import com.bookstore.project.repository.UserRepository;
-import com.bookstore.project.request.LoginRequest;
-import com.bookstore.project.request.RegisterRequest;
-import com.bookstore.project.request.UserProfileRequest;
 import com.bookstore.project.responses.UserContext;
-import com.bookstore.project.responses.UserProfileResponse;
-import com.bookstore.project.responses.UserResponse;
 import com.bookstore.project.service.UserService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Log4j2
@@ -39,16 +28,18 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private JavaMailSender mailSender;
 
+
+
     @Override
     public User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            return (User) authentication.getPrincipal(); // Trả về người dùng hiện tại
-        } else {
-            throw new AccessDeniedException("Unauthorized");
+        UserContext ctx = getUserContext(true);
+        Optional<User> user = userRepo.findByEmail(ctx.getUsername());
+        if (user.isEmpty()) {
+            throw RestException.notFound();
         }
+        return user.get();
     }
+
     @Override
     public UserContext authenticate(String email, String password) {
         User entity = getUserByEmail(email);

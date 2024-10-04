@@ -30,7 +30,7 @@ public class BookServiceImpl {
             book.setTitle(bookRequest.getTitle());
             book.setAuthor(bookRequest.getAuthor());
             book.setDescription(bookRequest.getDescription());
-            book.setPicture(bookRequest.getPicture());
+            book.setImageUrl(bookRequest.getImageUrl());
             book.setPrice(bookRequest.getPrice());
 
             // Fetch Genre and User
@@ -74,7 +74,7 @@ public class BookServiceImpl {
             book.setTitle(bookRequest.getTitle());
             book.setAuthor(bookRequest.getAuthor());
             book.setDescription(bookRequest.getDescription());
-            book.setPicture(bookRequest.getPicture());
+            book.setImageUrl(bookRequest.getImageUrl());
             book.setPrice(bookRequest.getPrice());
 
             // Fetch Genre and User if necessary
@@ -109,7 +109,7 @@ public class BookServiceImpl {
             response.setTitle(book.getTitle());
             response.setAuthor(book.getAuthor());
             response.setDescription(book.getDescription());
-            response.setPicture(book.getPicture());
+            response.setImageUrl(book.getImageUrl());
             response.setPrice(book.getPrice());
             response.setGenreName(book.getGenre().getName());
             response.setUsername(book.getUser().getUsername());

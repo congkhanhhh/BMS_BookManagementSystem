@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+
+
 @Service
 public class PermissionServiceImpl implements PermissionService {
 
@@ -21,7 +23,6 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void hasPermission(Permission permission) {
-
         // Lấy người dùng hiện tại từ SecurityContext
         User currentUser = userService.getCurrentUser();
 
@@ -45,4 +46,5 @@ public class PermissionServiceImpl implements PermissionService {
             throw RestException.forbidden();
         }
     }
+
 }
