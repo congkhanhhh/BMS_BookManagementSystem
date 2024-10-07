@@ -4,6 +4,8 @@ import com.bookstore.project.aspect.HasPermission;
 import com.bookstore.project.enumerated.Permission;
 import com.bookstore.project.request.OrderRequest;
 import com.bookstore.project.responses.OrderResponse;
+import com.bookstore.project.responses.RevenueByCategoryResponse;
+import com.bookstore.project.responses.RevenueResponse;
 import com.bookstore.project.service.impl.OrderServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -42,6 +44,7 @@ public class OrderController {
     // Get order by ID
     @GetMapping("/{orderId}")
     @HasPermission(Permission.VIEW_ORDER_DETAILS)
+    @Operation(summary = "Get list orders by id", security = {@SecurityRequirement(name = "bearerAuth")})
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long orderId) {
         OrderResponse orderResponse = orderServiceImpl.getOrderById(orderId); // Returns OrderResponse
         return ResponseEntity.ok(orderResponse);
@@ -50,6 +53,7 @@ public class OrderController {
     // Search orders by username
     @GetMapping("/search")
     @HasPermission(Permission.SEARCH_ORDER)
+    @Operation(summary = "Search Orders", security = {@SecurityRequirement(name = "bearerAuth")})
     public ResponseEntity<List<OrderResponse>> searchOrders(@RequestParam String Username) {
         List<OrderResponse> orders = orderServiceImpl.searchOrders(Username); // Returns List of OrderResponse
         return ResponseEntity.ok(orders);
@@ -58,6 +62,7 @@ public class OrderController {
     // Edit order by ID
     @PutMapping("/{orderId}")
     @HasPermission(Permission.EDIT_ORDER)
+    @Operation(summary = "Edit orders", security = {@SecurityRequirement(name = "bearerAuth")})
     public ResponseEntity<OrderResponse> editOrder(@PathVariable Long orderId, @RequestBody OrderRequest orderRequest) {
         OrderResponse updatedOrder = orderServiceImpl.editOrder(orderId, orderRequest); // Update and return the updated order
         return ResponseEntity.ok(updatedOrder);
@@ -66,6 +71,7 @@ public class OrderController {
     // Delete order by ID
     @DeleteMapping("/{orderId}")
     @HasPermission(Permission.DELETE_ORDER)
+    @Operation(summary = "Delete orders", security = {@SecurityRequirement(name = "bearerAuth")})
     public ResponseEntity<Void> deleteOrder(@PathVariable Long orderId) {
         orderServiceImpl.deleteOrder(orderId); // Delete order
         return ResponseEntity.noContent().build(); // Return 204 No Content if successful
@@ -77,6 +83,22 @@ public class OrderController {
     public ResponseEntity<List<OrderResponse>> getOwnOrders() {
         List<OrderResponse> orders = orderServiceImpl.getOwnOrders();
         return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/revenue/daily")
+    @HasPermission(Permission.GET_REVENUE_DAILY)
+    @Operation(summary = "Get money daily", security = {@SecurityRequirement(name = "bearerAuth")})
+    public ResponseEntity<List<RevenueResponse>> getDailyRevenue() {
+        List<RevenueResponse> dailyRevenue = orderServiceImpl.calculateDailyRevenue();
+        return ResponseEntity.ok(dailyRevenue);
+    }
+
+    @GetMapping("/revenue/category")
+    @HasPermission(Permission.GET_REVENUE_DAILY)
+    @Operation(summary = "Get money category", security = {@SecurityRequirement(name = "bearerAuth")})
+    public ResponseEntity<List<RevenueByCategoryResponse>> getRevenueByCategory() {
+        List<RevenueByCategoryResponse> revenueByCategory = orderServiceImpl.calculateRevenueByCategory();
+        return ResponseEntity.ok(revenueByCategory);
     }
 
 }

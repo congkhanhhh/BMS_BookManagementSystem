@@ -1,4 +1,4 @@
 package com.bookstore.project.service;
 
-public class FavoriteBookService {
+public interface FavoriteBookService {
 }

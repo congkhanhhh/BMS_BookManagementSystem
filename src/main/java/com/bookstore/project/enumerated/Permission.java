@@ -9,6 +9,7 @@ public enum Permission {
     UPLOAD_IMAGE_BOOK,    // Tải ảnh lên cho sách
     VIEW_ALL_BOOK_BY_GENRE,  // Xem sách theo thể loại
 
+    VIEW_ALL_GENRE,
     ADD_GENRE,            // Thêm thể loại
     EDIT_GENRE,           // Chỉnh sửa thể loại
     DELETE_GENRE,         // Xóa thể loại
@@ -21,6 +22,7 @@ public enum Permission {
     EDIT_ORDER,           // Chỉnh sửa đơn hàng
     DELETE_ORDER,         // Xóa đơn hàng
     SEARCH_ORDER,         // Tìm kiếm đơn hàng
+    GET_REVENUE_DAILY,
 
     //CUSTOMER Permissions
     VIEW_OWN_FAVORITE_BOOKS,

@@ -20,33 +20,33 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 45)
+    @Column(name = "username")
     private String username;
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "password")
     private String password;
 
-    @Column(nullable = false, unique = true, length = 100)
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "address", length = 45)
+    @Column(name = "address")
     private String address;
 
-    @Column(name = "phone_number", length = 45)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
     @Lob
-    @Column(name = "profile", nullable = true)
+    @Column(name = "profile")
     private byte[] profile;
 
-    @Column(name = "enable", nullable = false)
+    @Column(name = "enable")
     private boolean enable;
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "create_at", nullable = false)
+    @Column(name = "create_at")
     private LocalDate createAt;
 
     @Column(name = "reset_token")

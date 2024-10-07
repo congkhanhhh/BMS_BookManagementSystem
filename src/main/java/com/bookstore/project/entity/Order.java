@@ -20,14 +20,14 @@ public class Order {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "order_date", nullable = false)
+    @Column(name = "order_date")
     private Date orderDate;
 
-    @Column(name = "total_price", nullable = false)
+    @Column(name = "total_price")
     private BigDecimal totalPrice;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)

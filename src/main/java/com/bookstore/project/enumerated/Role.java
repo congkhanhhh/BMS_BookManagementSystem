@@ -24,6 +24,7 @@ public enum Role implements GrantedAuthority {
             Permission.DELETE_ORDER,         // Xóa đơn hàng
             Permission.SEARCH_ORDER,         // Tìm kiếm đơn hàng
             Permission.VIEW_OWN_ORDERS,
+            Permission.GET_REVENUE_DAILY,
 
             // Favorite book management
             Permission.VIEW_USER_FAVORITE_BOOK,   // Xem danh sách yêu thích của user
@@ -31,6 +32,7 @@ public enum Role implements GrantedAuthority {
             Permission.DELETE_FAVORITE_BOOK,     // Xóa sách khỏi yêu thích
 
             // Genre management
+            Permission.VIEW_ALL_GENRE,
             Permission.ADD_GENRE,             // Thêm thể loại
             Permission.EDIT_GENRE,            // Chỉnh sửa thể loại
             Permission.DELETE_GENRE           // Xóa thể loại

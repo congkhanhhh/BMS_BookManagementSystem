@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
+
 
 
 @Entity
@@ -28,6 +28,7 @@ public class Book {
     private String imageUrl;
     @Column(name = "price")
     private BigDecimal price;
+
     @ManyToOne
     @JoinColumn(name = "genre_id", referencedColumnName = "id")
     private Genre genre;
@@ -35,6 +36,7 @@ public class Book {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
+
     @Column(name = "created_at")
     private LocalDate created_at;
 }

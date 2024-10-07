@@ -14,7 +14,8 @@ import com.bookstore.project.responses.OrderItemResponse;
 import com.bookstore.project.responses.OrderResponse;
 import com.bookstore.project.repository.BookRepository;
 import com.bookstore.project.repository.OrderItemRepository;
-import com.bookstore.project.service.OrderService;
+import com.bookstore.project.responses.RevenueByCategoryResponse;
+import com.bookstore.project.responses.RevenueResponse;
 import com.bookstore.project.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -247,6 +248,22 @@ public class OrderServiceImpl {
         }
     }
 
+    @Transactional(readOnly = true)
+    public List<RevenueResponse> calculateDailyRevenue() {
+        List<Object[]> result = orderRepository.calculateTotalRevenueByDay();
+
+        return result.stream().map(row -> {
+            Date date = (Date) row[0];  // The date (grouped by)
+            BigDecimal totalRevenue = (BigDecimal) row[1];  // The total revenue for that day
+
+            RevenueResponse revenueResponse = new RevenueResponse();
+            revenueResponse.setDate(date);
+            revenueResponse.setTotalRevenue(totalRevenue);
+
+            return revenueResponse;
+        }).collect(Collectors.toList());
+    }
+
 
     private OrderResponse mapToOrderResponse(Order order) {
         OrderResponse orderResponse = new OrderResponse();
@@ -275,5 +292,22 @@ public class OrderServiceImpl {
         orderResponse.setOrderItems(itemResponses);
         return orderResponse;
     }
+
+    @Transactional(readOnly = true)
+    public List<RevenueByCategoryResponse> calculateRevenueByCategory() {
+        List<Object[]> result = orderRepository.calculateTotalRevenueByCategory();
+
+        return result.stream().map(row -> {
+            String category = (String) row[0];  // The category (grouped by)
+            BigDecimal totalRevenue = (BigDecimal) row[1];  // The total revenue for that category
+
+            RevenueByCategoryResponse revenueResponse = new RevenueByCategoryResponse();
+            revenueResponse.setCategory(category);
+            revenueResponse.setTotalRevenue(totalRevenue);
+
+            return revenueResponse;
+        }).collect(Collectors.toList());
+    }
+
 }
 
